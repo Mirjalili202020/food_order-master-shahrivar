@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>پروفایل کاربر</title>
+
+    <link rel="stylesheet" href="style-polished.css">
+</head>
+
+<body>
+
+    <h1>پروفایل کاربر</h1>
+
+    <nav>
+        <a href="index.html">صفحه اصلی</a>
+
+        <a href="cart.html">
+           سبد سفارش
+           <span id="cart-count">0</span>
+        </a>
+        
+        <a href="profile.html">پروفایل</a>
+        <a href="orders.html">تاریخچه سفارش‌ها</a>
+    </nav>
+
+
+    <div class="profile-card">
+
+        <h2>اطلاعات کاربر</h2>
+
+
+        <!--
+            فرم اطلاعات کاربر
+            در مرحله بعد با JavaScript
+            صحت اطلاعات واردشده را بررسی می‌کنیم.
+        -->
+        <form id="profile-form">
+
+
+            <!-- نام و نام خانوادگی -->
+            <label for="full-name">
+                نام و نام خانوادگی:
+            </label>
+
+            <input
+                type="text"
+                id="full-name"
+                value="محمد میرجلیلی"
+                required
+            >
+
+
+            <!-- شماره تلفن -->
+            <label for="phone">
+                شماره تلفن:
+            </label>
+
+            <input
+                type="tel"
+                id="phone"
+                value="09101590525"
+                required
+            >
+
+
+            <!-- ایمیل -->
+            <label for="email">
+                ایمیل:
+            </label>
+
+            <input
+                type="email"
+                id="email"
+                value="mirjil@gmail.com"
+                required
+            >
+
+
+            <!-- واحد -->
+            <label for="department">
+                واحد:
+            </label>
+
+            <input
+                type="text"
+                id="department"
+                value="مدیریت"
+                required
+            >
+
+
+            <!-- دکمه ثبت -->
+            <button type="submit">
+                ذخیره اطلاعات
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- JavaScript فرم -->
+    <script src="profile.js"></script>
+<script src="cart-count.js"></script>
+</body>
+</html>

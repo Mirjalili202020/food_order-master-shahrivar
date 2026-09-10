@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>جزئیات غذا</title>
+
+    <link rel="stylesheet" href="style-polished.css">
+</head>
+
+<body>
+
+    <h1>جزئیات غذا</h1>
+
+    <!-- منوی اصلی سایت -->
+    <nav>
+        <a href="index.html">صفحه اصلی</a>
+
+        <a href="cart.html">
+            سبد سفارش
+            <span id="cart-count">0</span>
+        </a>
+
+        <a href="profile.html">پروفایل</a>
+
+        <a href="orders.html">تاریخچه سفارش‌ها</a>
+    </nav>
+
+
+    <!-- بخش جزئیات غذا -->
+    <section class="food-details">
+
+        <!-- تصویر غذا -->
+        <img id="food-image" src="" alt="">
+
+
+        <!-- اطلاعات غذا -->
+        <div class="food-details-info">
+
+            <h2 id="food-name"></h2>
+
+            <p id="food-description"></p>
+
+            <h3>مواد تشکیل‌دهنده</h3>
+
+            <ul id="food-ingredients"></ul>
+
+            <p id="food-price" class="price"></p>
+
+            <!-- لینک بازگشت به منو -->
+            <a href="index.html" class="back-to-menu">
+                ← بازگشت به منوی غذاها
+            </a>
+
+        </div>
+
+    </section>
+
+
+    <!-- فایل اطلاعات غذا -->
+    <script src="food-details.js"></script>
+
+    <!-- شمارنده سبد -->
+    <script src="cart-count.js"></script>
+
+</body>
+
+</html>
