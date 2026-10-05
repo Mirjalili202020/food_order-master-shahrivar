@@ -1,75 +1,71 @@
 // =============================================
-// فایل script.js
-// وظایف اصلی صفحه منو:
-// 1) فیلتر غذاها بر اساس دسته‌بندی
-// 2) جستجوی غذا بر اساس نام
-// 3) افزودن غذا به سبد خرید
+// وظایف اصلی این فایل:
+// 1) فیلتر دسته‌بندی
+// 2) جستجوی غذا
+// 3) افزودن به سبد
 // 4) جلوگیری از سفارش غذای ناموجود
-// 5) اعمال محدودیت یک غذای اصلی در سبد
+// 5) محدودیت یک غذای اصلی
 // =============================================
 
-// ورودی جستجو را از صفحه پیدا می‌کنیم.
+// پیدا کردن ورودی جستجو
 const searchInput = document.querySelector("#search-input");
 
-// همه کارت‌های دسته‌بندی را پیدا می‌کنیم.
+// پیدا کردن همه دسته‌بندی‌ها
 const categories = document.querySelectorAll(".category");
 
-// این متغیر نگه می‌دارد که در حال حاضر چه دسته‌ای انتخاب شده است.
-// مقدار null یعنی هیچ دسته خاصی انتخاب نشده و همه دسته‌ها قابل نمایش هستند.
+// دسته انتخاب‌شده؛ null یعنی همه دسته‌ها
 let selectedCategory = null;
 
 
 // =========================
-// فیلتر دسته‌بندی‌ها
+// فیلتر دسته‌بندی
 // =========================
 
-// روی همه دسته‌بندی‌ها حرکت می‌کنیم تا برای هر کدام رویداد کلیک تعریف کنیم.
 categories.forEach(function(category) {
 
-    // وقتی روی یک دسته کلیک شود، این تابع اجرا می‌شود.
+    // اجرای کد هنگام کلیک روی دسته
     category.onclick = function() {
 
-        // ابتدا کلاس active را از همه دسته‌ها حذف می‌کنیم.
-        // به این ترتیب فقط دسته انتخاب‌شده حالت فعال خواهد داشت.
+        // حذف حالت active از همه دسته‌ها
         categories.forEach(function(item) {
             item.classList.remove("active");
         });
 
-        // متن داخل تگ p دسته کلیک‌شده را می‌خوانیم.
+        // گرفتن نام دسته از متن p
         const categoryName =
             category.querySelector("p").textContent.trim();
 
-        // اگر کاربر روی «همه دسته‌بندی‌ها» کلیک کند، فیلتر دسته را پاک می‌کنیم.
+        // اگر «همه دسته‌بندی‌ها» انتخاب شد
         if (categoryName === "همه دسته‌بندی‌ها") {
 
-            // null یعنی دیگر دسته مشخصی انتخاب نشده است.
+            // پاک کردن فیلتر دسته
             selectedCategory = null;
 
-            // این کلاس فقط برای یک افکت کوتاه هنگام پاک شدن فیلتر استفاده می‌شود.
+            // افکت کوتاه برای دکمه همه دسته‌ها
             category.classList.add("clear-filter");
 
-            // بعد از 150 میلی‌ثانیه کلاس افکت را حذف می‌کنیم.
+            // حذف افکت بعد از 150 میلی‌ثانیه
             setTimeout(function() {
                 category.classList.remove("clear-filter");
             }, 150);
 
-            // تمام کارت‌های غذا را از صفحه می‌گیریم.
+            // پیدا کردن همه کارت‌های غذا
             const foodCards =
                 document.querySelectorAll(".food-card");
 
-            // همه کارت‌ها را دوباره نمایش می‌دهیم.
+            // نمایش همه کارت‌ها
             foodCards.forEach(function(card) {
                 card.style.display = "";
             });
 
-            // چون کار این حالت تمام شده، از تابع خارج می‌شویم.
+            // پایان اجرای این بخش
             return;
         }
 
-        // به دسته انتخاب‌شده کلاس active می‌دهیم تا از نظر ظاهری مشخص شود.
+        // فعال کردن دسته انتخاب‌شده
         category.classList.add("active");
 
-        // متن فارسی هر دسته را به مقدار انگلیسی data-category مربوط به کارت‌ها نگاشت می‌کنیم.
+        // تبدیل نام فارسی دسته به مقدار data-category
         const categoryMap = {
             "غذای ایرانی": "iranian",
             "فست فود": "fastfood",
@@ -77,18 +73,17 @@ categories.forEach(function(category) {
             "دسر": "dessert"
         };
 
-        // مقدار دسته انتخاب‌شده را ذخیره می‌کنیم.
+        // ذخیره دسته انتخاب‌شده
         selectedCategory = categoryMap[categoryName];
 
-        // همه کارت‌های غذا را پیدا می‌کنیم.
+        // پیدا کردن کارت‌های غذا
         const foodCards =
             document.querySelectorAll(".food-card");
 
-        // تک‌تک کارت‌ها را با دسته انتخاب‌شده مقایسه می‌کنیم.
+        // بررسی دسته هر کارت
         foodCards.forEach(function(card) {
 
-            // اگر data-category کارت برابر دسته انتخاب‌شده باشد، کارت نمایش داده می‌شود؛
-            // در غیر این صورت مخفی می‌شود.
+            // نمایش کارت مطابق دسته انتخاب‌شده
             card.style.display =
                 card.dataset.category === selectedCategory
                     ? ""
@@ -102,39 +97,38 @@ categories.forEach(function(category) {
 // جستجوی غذا
 // =========================
 
-// با هر تغییر در ورودی جستجو، فیلتر جستجو اجرا می‌شود.
+// اجرای جستجو هنگام تغییر متن ورودی
 searchInput.addEventListener("input", function() {
 
-    // متن واردشده را می‌خوانیم و فاصله‌های اضافی ابتدا و انتها را حذف می‌کنیم.
+    // گرفتن متن جستجو و حذف فاصله‌های اضافی
     const searchText =
         searchInput.value.trim();
 
-    // همه کارت‌های غذا را دریافت می‌کنیم.
+    // پیدا کردن همه کارت‌های غذا
     const foodCards =
         document.querySelectorAll(".food-card");
 
-    // تک‌تک کارت‌ها را بررسی می‌کنیم.
+    // بررسی تک‌تک کارت‌ها
     foodCards.forEach(function(card) {
 
-        // نام غذا از عنوان h3 کارت خوانده می‌شود.
+        // گرفتن نام غذا
         const foodName =
             card.querySelector("h3").textContent;
 
-        // دسته غذا از ویژگی data-category کارت خوانده می‌شود.
+        // گرفتن دسته غذا
         const foodCategory =
             card.dataset.category;
 
-        // includes بررسی می‌کند متن جستجو داخل نام غذا وجود دارد یا نه.
+        // بررسی وجود متن جستجو در نام غذا
         const matchesSearch =
             foodName.includes(searchText);
 
-        // این شرط بررسی می‌کند کارت با دسته انتخاب‌شده نیز هماهنگ باشد.
-        // اگر selectedCategory برابر null باشد یعنی همه دسته‌ها مجاز هستند.
+        // بررسی هماهنگی کارت با دسته انتخاب‌شده
         const matchesCategory =
             selectedCategory === null ||
             foodCategory === selectedCategory;
 
-        // فقط کارتی نمایش داده می‌شود که هم با جستجو و هم با دسته انتخابی مطابقت داشته باشد.
+        // نمایش فقط در صورت برقرار بودن هر دو شرط
         if (matchesSearch && matchesCategory) {
             card.style.display = "";
         } else {
@@ -148,58 +142,57 @@ searchInput.addEventListener("input", function() {
 // افزودن غذا به سبد
 // =========================
 
-// تمام دکمه‌های «افزودن به سبد» را پیدا می‌کنیم.
+// پیدا کردن همه دکمه‌های افزودن به سبد
 const buttons =
     document.querySelectorAll(".add-to-cart");
 
-// برای هر دکمه یک رویداد کلیک تعریف می‌کنیم.
+// افزودن رویداد کلیک به هر دکمه
 buttons.forEach(function(button) {
 
     button.onclick = function() {
 
-        // parentElement دکمه، همان کارت غذای مربوط به آن است.
+        // پیدا کردن کارت مربوط به همین دکمه
         const card =
             button.parentElement;
 
-        // بررسی می‌کنیم کارت دارای عنصر .available هست یا نه.
-        // وجود این کلاس یعنی غذا موجود است.
+        // بررسی موجود بودن غذا
         const availability =
             card.querySelector(".available");
 
-        // اگر عنصر available پیدا نشد، غذا ناموجود است و سفارش متوقف می‌شود.
+        // اگر غذا موجود نبود، ادامه نده
         if (!availability) {
             alert("این غذا در حال حاضر ناموجود است.");
             return;
         }
 
-        // نام غذای انتخاب‌شده را از h3 کارت می‌خوانیم.
+        // گرفتن نام غذا
         const foodName =
             card.querySelector("h3").textContent;
 
-        // قیمت غذا را از عنصر دارای کلاس price می‌خوانیم.
+        // گرفتن قیمت غذا
         const foodPrice =
             card.querySelector(".price").textContent;
 
-        // دسته غذا را از data-category کارت می‌خوانیم.
+        // گرفتن دسته غذا
         const foodCategory =
             card.dataset.category;
 
-        // سبد فعلی را از localStorage می‌خوانیم.
-        // اگر سبدی وجود نداشته باشد، یک آرایه خالی می‌سازیم.
+        // خواندن سبد از localStorage
+        // اگر سبد وجود نداشت، آرایه خالی بساز
         let cart =
             JSON.parse(localStorage.getItem("cart")) || [];
 
-        // دسته‌های غذای ایرانی و فست‌فود را به عنوان «غذای اصلی» در نظر گرفته‌ایم.
+        // دسته‌هایی که غذای اصلی محسوب می‌شوند
         const mainFoodCategories = [
             "iranian",
             "fastfood"
         ];
 
-        // includes بررسی می‌کند آیا دسته غذای انتخاب‌شده جزو غذاهای اصلی است یا نه.
+        // بررسی اینکه غذای جدید اصلی است یا نه
         const isMainFood =
             mainFoodCategories.includes(foodCategory);
 
-        // با find بررسی می‌کنیم آیا از قبل یک غذای اصلی داخل سبد وجود دارد یا نه.
+        // پیدا کردن غذای اصلی موجود در سبد
         const existingMainFood =
             cart.find(function(item) {
                 return mainFoodCategories.includes(
@@ -207,8 +200,7 @@ buttons.forEach(function(button) {
                 );
             });
 
-        // اگر غذای جدید اصلی باشد و قبلاً هم غذای اصلی در سبد وجود داشته باشد،
-        // اجازه افزودن غذای اصلی دوم را نمی‌دهیم.
+        // جلوگیری از افزودن غذای اصلی دوم
         if (isMainFood && existingMainFood) {
             alert(
                 "هر کارمند در هر روز فقط می‌تواند یک غذای اصلی سفارش دهد.\n\n" +
@@ -217,8 +209,7 @@ buttons.forEach(function(button) {
             return;
         }
 
-        // یک Object برای غذای انتخاب‌شده می‌سازیم.
-        // این اطلاعات بعداً در سبد و سفارش استفاده می‌شوند.
+        // ساخت Object مربوط به غذای انتخاب‌شده
         const food = {
             name: foodName,
             price: foodPrice,
@@ -226,39 +217,38 @@ buttons.forEach(function(button) {
             quantity: 1
         };
 
-        // بررسی می‌کنیم آیا دقیقاً همین غذا قبلاً در سبد وجود دارد یا نه.
+        // پیدا کردن غذای مشابه در سبد
         const existingFood =
             cart.find(function(item) {
                 return item.name === food.name;
             });
 
-        // اگر غذا قبلاً در سبد باشد، به جای ساخت مورد جدید تعدادش را افزایش می‌دهیم.
+        // اگر غذا قبلاً وجود داشت، تعدادش را زیاد کن
         if (existingFood) {
             existingFood.quantity += 1;
         } else {
-            // اگر غذا در سبد نباشد، آن را به انتهای آرایه cart اضافه می‌کنیم.
+            // اگر وجود نداشت، آن را به سبد اضافه کن
             cart.push(food);
         }
 
-        // آرایه سبد را با JSON.stringify به متن تبدیل و در localStorage ذخیره می‌کنیم.
+        // تبدیل cart به JSON و ذخیره در localStorage
         localStorage.setItem(
             "cart",
             JSON.stringify(cart)
         );
 
-        // یک رویداد سفارشی ایجاد می‌کنیم تا cart-count.js متوجه تغییر سبد شود.
-        // به این ترتیب شمارنده سبد بدون رفرش صفحه به‌روز می‌شود.
+        // خبر دادن به بخش شمارنده سبد
         document.dispatchEvent(
             new Event("cartUpdated")
         );
 
-        // برای بازخورد بصری، متن دکمه را موقتاً تغییر می‌دهیم.
+        // تغییر موقت متن دکمه
         button.textContent = "✓ اضافه شد";
 
-        // دکمه را موقتاً غیرفعال می‌کنیم تا کاربر چند بار سریع روی آن کلیک نکند.
+        // غیرفعال کردن موقت دکمه
         button.disabled = true;
 
-        // بعد از یک ثانیه، دکمه را به حالت عادی برمی‌گردانیم.
+        // برگرداندن دکمه به حالت عادی بعد از یک ثانیه
         setTimeout(function() {
             button.textContent = "افزودن به سبد";
             button.disabled = false;
@@ -266,5 +256,5 @@ buttons.forEach(function(button) {
     };
 });
 
-// این پیام برای اطمینان از اجرای کامل فایل در Console نمایش داده می‌شود.
+// پیام تست برای اطمینان از اجرای کامل فایل
 console.log("آخر فایل اجرا شد");
