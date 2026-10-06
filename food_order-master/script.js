@@ -165,17 +165,22 @@ buttons.forEach(function(button) {
             return;
         }
 
-        // گرفتن نام غذا
-        const foodName =
-            card.querySelector("h3").textContent;
+        // شناسه غذا را از data-id کارت می‌گیریم.
+        const foodId = card.dataset.id;
 
-        // گرفتن قیمت غذا
-        const foodPrice =
-            card.querySelector(".price").textContent;
+        // نام غذا را از عنوان کارت می‌گیریم.
+        const foodName = card.querySelector("h3").textContent;
 
-        // گرفتن دسته غذا
-        const foodCategory =
-            card.dataset.category;
+        // قیمت را به صورت متن از کارت غذا می‌گیریم.
+        const foodPriceText = card.querySelector(".price").textContent;
+
+        // ویرگول و کلمه «تومان» را حذف می‌کنیم و قیمت را به عدد تبدیل می‌کنیم.
+        const foodPrice = Number(
+          foodPriceText.replace(/,/g, "").replace("تومان", "").trim()
+        );
+
+        // دسته‌بندی غذا را از data-category کارت می‌گیریم.
+        const foodCategory = card.dataset.category;
 
         // خواندن سبد از localStorage
         // اگر سبد وجود نداشت، آرایه خالی بساز
@@ -209,23 +214,23 @@ buttons.forEach(function(button) {
             return;
         }
 
-        // ساخت Object مربوط به غذای انتخاب‌شده
+        // اطلاعات غذا را با ساختار جدید داخل سبد قرار می‌دهیم.
         const food = {
-            name: foodName,
-            price: foodPrice,
-            category: foodCategory,
-            quantity: 1
+          id: foodId,
+          title: foodName,
+          price: foodPrice,
+          count: 1
         };
 
         // پیدا کردن غذای مشابه در سبد
         const existingFood =
             cart.find(function(item) {
-                return item.name === food.name;
+                return item.id === food.id;
             });
 
         // اگر غذا قبلاً وجود داشت، تعدادش را زیاد کن
         if (existingFood) {
-            existingFood.quantity += 1;
+            existingFood.count += 1;
         } else {
             // اگر وجود نداشت، آن را به سبد اضافه کن
             cart.push(food);
