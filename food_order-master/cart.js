@@ -13,8 +13,12 @@ console.log("cart.js وصل شد");
 
 // سبد ذخیره‌شده را از localStorage می‌خوانیم.
 // اگر سبدی وجود نداشته باشد، آرایه خالی استفاده می‌شود.
-const cart =
+let cart =
     JSON.parse(localStorage.getItem("cart")) || [];
+
+ // دسته‌بندی غذاها را جداگانه از localStorage می‌خوانیم.
+const foodCategories =
+    JSON.parse(localStorage.getItem("foodCategories")) || {};
 
 // محلی که کارت‌های اقلام سبد در آن ساخته می‌شوند.
 const cartContainer =
@@ -70,18 +74,19 @@ orderButton.onclick = function() {
             return order.dateKey === todayKey &&
                 order.foods.some(function(food) {
 
-                    // سپس بررسی می‌کنیم دسته غذا جزو غذاهای اصلی است یا نه.
+                   
                     return mainFoodCategories.includes(
-                        food.category
+                    foodCategories[food.id] || food.category
                     );
                 });
         });
 
-    // بررسی می‌کنیم آیا سبد فعلی هم حداقل یک غذای اصلی دارد یا نه.
+    
+    // بررسی می‌کنیم آیا سبد فعلی غذای اصلی دارد یا نه.
     const cartHasMainFood =
         cart.some(function(food) {
             return mainFoodCategories.includes(
-                food.category
+                foodCategories[food.id] || food.category
             );
         });
 
@@ -98,19 +103,25 @@ orderButton.onclick = function() {
         return;
     }
 
-    // یک Object جدید برای سفارش می‌سازیم.
+    // محاسبه جمع قیمت غذاها
+    const subtotal = cart.reduce(function (sum, food) {
+        return sum + food.price * food.count;
+    }, 0);
+
+    // محاسبه مالیات ۹ درصد
+    const tax = subtotal * 0.09;
+
+    // محاسبه مبلغ نهایی
+    const finalTotal = subtotal + tax;
+
+    // ساخت اطلاعات سفارش
     const order = {
-
-        // تمام اقلام فعلی سبد داخل سفارش ذخیره می‌شوند.
         foods: cart,
-
-        // وضعیت اولیه سفارش.
+        subtotal: subtotal,
+        tax: tax,
+        total: finalTotal,
         status: "ثبت شده",
-
-        // تاریخ قابل‌خواندن برای نمایش به کاربر.
         date: new Date().toLocaleString("fa-IR"),
-
-        // کلید تاریخ برای بررسی محدودیت روزانه در سفارش‌های بعدی.
         dateKey: todayKey
     };
 
@@ -144,32 +155,21 @@ if (cart.length > 0) {
     // محتوای قبلی ظرف سبد را خالی می‌کنیم تا اقلام را با JavaScript بسازیم.
     cartContainer.innerHTML = "";
 
-    // متغیر total برای جمع مبلغ همه اقلام سبد.
-    let total = 0;
+    // جمع مبلغ تمام غذاها با درنظرگرفتن تعداد هر غذا
+    const total = cart.reduce(function (sum, food) {
+          return sum + food.price * food.count;
+        }, 0);
 
     // روی همه اقلام سبد حرکت می‌کنیم.
     // index شماره هر آیتم داخل آرایه را مشخص می‌کند و برای دکمه‌ها استفاده می‌شود.
     cart.forEach(function(food, index) {
 
-        // قیمت در پروژه به صورت رشته فارسی مثل «۱۸۰,۰۰۰ تومان» است.
-        // برای محاسبه، آن را به عدد واقعی JavaScript تبدیل می‌کنیم.
-        const priceNumber = Number(
-            food.price
-                // کلمه تومان را حذف می‌کنیم.
-                .replace("تومان", "")
+    
+        // قیمت غذا از قبل در script.js به عدد تبدیل شده است.
+        const priceNumber = food.price;
 
-                // تمام ویرگول‌ها را حذف می‌کنیم.
-                .replace(/,/g, "")
-
-                // ارقام فارسی را به ارقام انگلیسی تبدیل می‌کنیم.
-                .replace(/[۰-۹]/g, function(digit) {
-                    return "۰۱۲۳۴۵۶۷۸۹".indexOf(digit);
-                })
-        );
-
-        // قیمت کل همین غذا = قیمت واحد × تعداد.
-        const foodTotal =
-            priceNumber * food.quantity;
+        // قیمت کل این غذا = قیمت واحد × تعداد.
+        const foodTotal = priceNumber * food.count;
 
         // با Template Literal، HTML مربوط به هر آیتم سبد را می‌سازیم.
         // data-index باعث می‌شود بعداً بفهمیم هر دکمه مربوط به کدام عضو آرایه cart است.
@@ -178,13 +178,14 @@ if (cart.length > 0) {
             <div class="cart-item">
 
                 <!-- نام غذا -->
-                <h3>${food.name}</h3>
+                <h3>${food.title}</h3>
 
                 <!-- قیمت واحد -->
                 <p>
                     قیمت واحد:
+                    
                     <span class="cart-food-price">
-                        ${food.price}
+                        ${priceNumber.toLocaleString("fa-IR")} تومان
                     </span>
                 </p>
 
@@ -197,7 +198,7 @@ if (cart.length > 0) {
                         −
                     </button>
 
-                    <span>${food.quantity}</span>
+                    <span>${food.count}</span>
 
                     <button
                         class="increase-button"
@@ -225,16 +226,21 @@ if (cart.length > 0) {
             </div>
         `;
 
-        // مبلغ این آیتم را به مبلغ کل سبد اضافه می‌کنیم.
-        total += foodTotal;
+
 
         // مقدار جمع فعلی را برای تست در Console نمایش می‌دهیم.
         console.log("total : ", total);
     });
 
-    // مبلغ نهایی را با فرمت عدد فارسی در صفحه نمایش می‌دهیم.
+    // محاسبه مالیات ۹ درصد
+    const tax = total * 0.09;
+
+    // محاسبه مبلغ نهایی با احتساب مالیات
+    const finalTotal = total + tax;
+
+    // نمایش مبلغ نهایی با مالیات
     totalPrice.textContent =
-        `مبلغ نهایی: ${total.toLocaleString("fa-IR")} تومان`;
+        `مبلغ نهایی با مالیات ۹٪: ${finalTotal.toLocaleString("fa-IR")} تومان`;
 
 
     // =========================
@@ -257,7 +263,7 @@ if (cart.length > 0) {
                 Number(button.dataset.index);
 
             // تعداد آیتم موردنظر را یک واحد افزایش می‌دهیم.
-            cart[index].quantity += 1;
+            cart[index].count += 1;
 
             // سبد جدید را ذخیره می‌کنیم.
             localStorage.setItem(
@@ -290,13 +296,15 @@ if (cart.length > 0) {
             const index =
                 Number(button.dataset.index);
 
+                
             // اگر تعداد بیشتر از یک باشد، فقط یک واحد کم می‌کنیم.
-            if (cart[index].quantity > 1) {
-                cart[index].quantity -= 1;
+            if (cart[index].count > 1) {
+                cart[index].count -= 1;
             } else {
-                // اگر تعداد برابر یک باشد، کاهش دوباره یعنی حذف آیتم از سبد.
-                // splice از محل index یک عضو را از آرایه حذف می‌کند.
-                cart.splice(index, 1);
+                // اگر تعداد یک باشد، غذا را با filter از سبد حذف می‌کنیم.
+                cart = cart.filter(function(food, foodIndex) {
+                    return foodIndex !== index;
+                });
             }
 
             // سبد تغییرکرده را ذخیره می‌کنیم.
@@ -330,8 +338,10 @@ if (cart.length > 0) {
             const index =
                 Number(button.dataset.index);
 
-            // آیتم موردنظر را به طور کامل از آرایه حذف می‌کنیم.
-            cart.splice(index, 1);
+            // همه غذاها را نگه می‌داریم، به‌جز غذایی که کاربر حذف کرده است.
+            cart = cart.filter(function(food, foodIndex) {
+                return foodIndex !== index;
+            });
 
             // نسخه جدید سبد را ذخیره می‌کنیم.
             localStorage.setItem(

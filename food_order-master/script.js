@@ -198,12 +198,17 @@ buttons.forEach(function(button) {
             mainFoodCategories.includes(foodCategory);
 
         // پیدا کردن غذای اصلی موجود در سبد
-        const existingMainFood =
-            cart.find(function(item) {
-                return mainFoodCategories.includes(
-                    item.category
-                );
-            });
+               
+        const existingMainFood = cart.find(function(item) {
+            // کارت غذای موردنظر را با شناسه آن پیدا می‌کنیم.
+            const foodCard = document.querySelector(
+                `.food-card[data-id="${item.id}"]`
+            );
+
+            // بررسی می‌کنیم که غذا ایرانی یا فست‌فود باشد.
+            return foodCard &&
+                mainFoodCategories.includes(foodCard.dataset.category);
+        });
 
         // جلوگیری از افزودن غذای اصلی دوم
         if (isMainFood && existingMainFood) {
@@ -235,6 +240,19 @@ buttons.forEach(function(button) {
             // اگر وجود نداشت، آن را به سبد اضافه کن
             cart.push(food);
         }
+
+        // دسته‌بندی غذاها را جدا از اطلاعات اصلی سبد ذخیره می‌کنیم.
+        const foodCategories =
+            JSON.parse(localStorage.getItem("foodCategories")) || {};
+
+        // دسته‌بندی این غذا را با شناسه آن نگه می‌داریم.
+        foodCategories[foodId] = foodCategory;
+
+        // اطلاعات دسته‌بندی را در localStorage ذخیره می‌کنیم.
+        localStorage.setItem(
+            "foodCategories",
+            JSON.stringify(foodCategories)
+        );
 
         // تبدیل cart به JSON و ذخیره در localStorage
         localStorage.setItem(
