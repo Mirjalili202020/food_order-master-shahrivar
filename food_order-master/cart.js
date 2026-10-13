@@ -149,6 +149,8 @@ orderButton.onclick = function() {
 // نمایش سبد سفارش
 // =========================
 
+function renderCart() {
+
 // اگر حداقل یک آیتم داخل سبد وجود داشته باشد، اقلام را نمایش می‌دهیم.
 if (cart.length > 0) {
 
@@ -271,8 +273,8 @@ if (cart.length > 0) {
                 JSON.stringify(cart)
             );
 
-            // صفحه را رفرش می‌کنیم تا تعداد و مبلغ‌ها دوباره محاسبه شوند.
-            location.reload();
+            // سبد را دوباره نمایش می‌دهیم، بدون رفرش صفحه.
+            renderCart();
         };
     });
 
@@ -313,8 +315,9 @@ if (cart.length > 0) {
                 JSON.stringify(cart)
             );
 
-            // برای نمایش نتیجه جدید صفحه را رفرش می‌کنیم.
-            location.reload();
+           // سبد را دوباره نمایش می‌دهیم، بدون رفرش صفحه.
+           renderCart();
+            
         };
     });
 
@@ -349,8 +352,8 @@ if (cart.length > 0) {
                 JSON.stringify(cart)
             );
 
-            // صفحه را برای نمایش نتیجه جدید رفرش می‌کنیم.
-            location.reload();
+           // سبد را دوباره نمایش می‌دهیم، بدون رفرش صفحه.
+           renderCart();
         };
     });
 
@@ -363,3 +366,7 @@ if (cart.length > 0) {
     // وقتی سبد خالی است، مبلغ نهایی هم نمایش داده نمی‌شود.
     totalPrice.textContent = "";
 }
+
+}
+
+renderCart();
