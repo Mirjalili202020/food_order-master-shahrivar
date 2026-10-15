@@ -10,12 +10,66 @@
 // پیدا کردن ورودی جستجو
 const searchInput = document.querySelector("#search-input");
 
+const sortSelect = document.querySelector("#sort-select");
+
 // پیدا کردن همه دسته‌بندی‌ها
 const categories = document.querySelectorAll(".category");
 
 // دسته انتخاب‌شده؛ null یعنی همه دسته‌ها
 let selectedCategory = null;
 
+const foodContainer = document.querySelector(".food-container");
+const originalCardOrder = Array.from(
+    foodContainer.querySelectorAll(".food-card")
+);
+
+// اعمال هم‌زمان جست‌وجو و فیلتر دسته‌بندی
+function applyFilters() {
+    const searchText = searchInput.value.trim().toLowerCase();
+
+    const cards = Array.from(
+        foodContainer.querySelectorAll(".food-card")
+    );
+
+    // مشخص می‌کنیم هر کارت باید نمایش داده شود یا نه
+    cards.forEach((card) => {
+        const foodName = card.querySelector("h3").textContent
+            .trim()
+            .toLowerCase();
+
+        const foodCategory = card.dataset.category;
+
+        const matchesSearch = foodName.includes(searchText);
+
+        const matchesCategory =
+            selectedCategory === null ||
+            foodCategory === selectedCategory;
+
+        card.style.display =
+            matchesSearch && matchesCategory ? "" : "none";
+    });
+
+    // انتخاب ترتیب نمایش غذاها
+    let sortedCards = [...originalCardOrder];
+    const sortValue = sortSelect.value;
+
+    if (sortValue === "price-asc") {
+        sortedCards.sort((a, b) => getPrice(a) - getPrice(b));
+    } else if (sortValue === "price-desc") {
+        sortedCards.sort((a, b) => getPrice(b) - getPrice(a));
+    }
+
+    // برگرداندن کارت‌ها به ترتیب انتخاب‌شده
+    sortedCards.forEach((card) => {
+        foodContainer.appendChild(card);
+    });
+}
+
+// استخراج قیمت عددی از متن قیمت غذا
+function getPrice(card) {
+    const priceText = card.querySelector(".price").textContent;
+    return Number(priceText.replace(/[^\d]/g, ""));
+}
 
 // =========================
 // فیلتر دسته‌بندی
@@ -49,16 +103,7 @@ categories.forEach(function(category) {
                 category.classList.remove("clear-filter");
             }, 150);
 
-            // پیدا کردن همه کارت‌های غذا
-            const foodCards =
-                document.querySelectorAll(".food-card");
-
-            // نمایش همه کارت‌ها
-            foodCards.forEach(function(card) {
-                card.style.display = "";
-            });
-
-            // پایان اجرای این بخش
+            applyFilters();
             return;
         }
 
@@ -75,6 +120,8 @@ categories.forEach(function(category) {
 
         // ذخیره دسته انتخاب‌شده
         selectedCategory = categoryMap[categoryName];
+
+        applyFilters();
 
         // پیدا کردن کارت‌های غذا
         const foodCards =
@@ -97,45 +144,11 @@ categories.forEach(function(category) {
 // جستجوی غذا
 // =========================
 
-// اجرای جستجو هنگام تغییر متن ورودی
-searchInput.addEventListener("input", function() {
+     // اجرای فیلترها هنگام تایپ در کادر جست‌وجو
+searchInput.addEventListener("input", applyFilters);
 
-    // گرفتن متن جستجو و حذف فاصله‌های اضافی
-    const searchText =
-        searchInput.value.trim();
-
-    // پیدا کردن همه کارت‌های غذا
-    const foodCards =
-        document.querySelectorAll(".food-card");
-
-    // بررسی تک‌تک کارت‌ها
-    foodCards.forEach(function(card) {
-
-        // گرفتن نام غذا
-        const foodName =
-            card.querySelector("h3").textContent;
-
-        // گرفتن دسته غذا
-        const foodCategory =
-            card.dataset.category;
-
-        // بررسی وجود متن جستجو در نام غذا
-        const matchesSearch =
-            foodName.includes(searchText);
-
-        // بررسی هماهنگی کارت با دسته انتخاب‌شده
-        const matchesCategory =
-            selectedCategory === null ||
-            foodCategory === selectedCategory;
-
-        // نمایش فقط در صورت برقرار بودن هر دو شرط
-        if (matchesSearch && matchesCategory) {
-            card.style.display = "";
-        } else {
-            card.style.display = "none";
-        }
-    });
-});
+// اجرای فیلترها هنگام تغییر ترتیب قیمت
+sortSelect.addEventListener("change", applyFilters); 
 
 
 // =========================
