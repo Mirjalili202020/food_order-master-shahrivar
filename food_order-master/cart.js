@@ -7,6 +7,7 @@
 // 4) ثبت سفارش
 // 5) کنترل محدودیت یک غذای اصلی در هر روز
 // =============================================
+document.addEventListener("DOMContentLoaded", function () {
 
 // پیام تست برای اطمینان از اتصال فایل JavaScript به صفحه سبد.
 console.log("cart.js وصل شد");
@@ -370,3 +371,4 @@ if (cart.length > 0) {
 }
 
 renderCart();
+});
