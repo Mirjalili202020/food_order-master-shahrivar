@@ -274,6 +274,9 @@ if (cart.length > 0) {
                 JSON.stringify(cart)
             );
 
+            // به شمارندهٔ نوار ناوبری خبر می‌دهیم که سبد تغییر کرده است.
+            document.dispatchEvent(new Event("cartUpdated"));
+
             // سبد را دوباره نمایش می‌دهیم، بدون رفرش صفحه.
             renderCart();
         };
@@ -316,6 +319,9 @@ if (cart.length > 0) {
                 JSON.stringify(cart)
             );
 
+            // به شمارندهٔ نوار ناوبری خبر می‌دهیم که سبد تغییر کرده است.
+            document.dispatchEvent(new Event("cartUpdated"));
+
            // سبد را دوباره نمایش می‌دهیم، بدون رفرش صفحه.
            renderCart();
             
@@ -353,8 +359,11 @@ if (cart.length > 0) {
                 JSON.stringify(cart)
             );
 
-           // سبد را دوباره نمایش می‌دهیم، بدون رفرش صفحه.
-           renderCart();
+            // به نوار ناوبری خبر می‌دهیم که سبد تغییر کرده است.
+            document.dispatchEvent(new Event("cartUpdated"));
+
+            // سبد را دوباره نمایش می‌دهیم، بدون رفرش صفحه.
+            renderCart();
         };
     });
 
