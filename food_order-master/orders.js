@@ -40,43 +40,33 @@ orders.forEach(function(order, orderIndex) {
         // نام، تعداد و قیمت هر غذا را به HTML سفارش اضافه می‌کنیم.
         orderHTML += `
             <div class="order-food">
-                <p><strong>غذا:</strong> ${food.name}</p>
-                <p><strong>تعداد:</strong> ${food.quantity}</p>
-                <p><strong>قیمت:</strong> ${food.price}</p>
+                <p><strong>غذا:</strong> ${food.title}</p>
+                <p><strong>تعداد:</strong> ${food.count}</p>
+                <p><strong>قیمت:</strong> ${Number(food.price).toLocaleString("fa-IR")} تومان
+                </p>
             </div>
         `;
 
-        // قیمت در پروژه به شکل متن فارسی مثل «۱۸۰,۰۰۰ تومان» ذخیره شده است.
-        // برای انجام محاسبات باید کلمه تومان، ویرگول و ارقام فارسی را تبدیل کنیم.
-        const priceNumber = Number(
-            food.price
-                // کلمه تومان را از متن قیمت حذف می‌کنیم.
-                .replace("تومان", "")
+        // قیمت غذا از قبل به شکل عدد ذخیره شده است.
+        const priceNumber = Number(food.price) || 0;
 
-                // همه ویرگول‌ها را حذف می‌کنیم.
-                .replace(/,/g, "")
-
-                // هر رقم فارسی را به معادل انگلیسی آن تبدیل می‌کنیم.
-                .replace(/[۰-۹]/g, function(digit) {
-                    return "۰۱۲۳۴۵۶۷۸۹".indexOf(digit);
-                })
-        );
-
-        // قیمت واحد را در تعداد ضرب کرده و به جمع کل سفارش اضافه می‌کنیم.
-        orderTotal += priceNumber * food.quantity;
+        // قیمت واحد را در آن ضرب می کنیم و به مبلغ کل سفارش اضافه می کنیم
+        orderTotal += priceNumber * food.count;
     });
 
     // تاریخ، مبلغ نهایی و وضعیت سفارش را به انتهای کارت اضافه می‌کنیم.
     orderHTML += `
-            <p><strong>تاریخ ثبت:</strong> ${order.date}</p>
-            <p><strong>مبلغ کل سفارش:</strong> ${orderTotal.toLocaleString("fa-IR")} تومان</p>
-            <p><strong>وضعیت:</strong> ${order.status}</p>
+        <p><strong>تاریخ ثبت:</strong> ${order.date}</p>
+        <p><strong>جمع قیمت غذاها:</strong> ${(order.subtotal ?? orderTotal).toLocaleString("fa-IR")} تومان</p>
+        <p><strong>مالیات ۹٪:</strong> ${(order.tax ?? 0).toLocaleString("fa-IR")} تومان</p>
+        <p><strong>مبلغ نهایی:</strong> ${(order.total ?? orderTotal).toLocaleString("fa-IR")} تومان</p>
+        <p><strong>وضعیت:</strong> ${order.status}</p>
         </div>
     `;
 
     // کارت ساخته‌شده را داخل صفحه قرار می‌دهیم.
     ordersContainer.innerHTML += orderHTML;
-});
+    });
 
 // این دو پیام برای تست و مشاهده اطلاعات در Console مرورگر هستند.
 console.log(orders);

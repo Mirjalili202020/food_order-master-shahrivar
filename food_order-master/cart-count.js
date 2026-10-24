@@ -29,8 +29,8 @@ function updateCartCount() {
     // روی تمام غذاهای داخل سبد حرکت می‌کنیم.
     cart.forEach(function(food) {
 
-        // quantity هر غذا را به مجموع تعداد آیتم‌ها اضافه می‌کنیم.
-        totalItems += food.quantity;
+       // تعداد هر غذا را به مجموع تعداد آیتم‌های سبد اضافه می‌کنیم.
+       totalItems += Number(food.count) || 0;
     });
 
     // مقدار نهایی را داخل شمارنده صفحه نمایش می‌دهیم.
