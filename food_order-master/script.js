@@ -193,9 +193,11 @@ addToCartButtons.forEach(function (button) {
   });
 });
 
-// =============================================
-// مودال جزئیات غذا و امتیازدهی ستاره‌ای
-// =============================================
+
+/* =============================================
+   مودال جزئیات غذا و امتیازدهی ستاره‌ای
+============================================= */
+
 const foodModal = document.getElementById("food-modal");
 const closeFoodModal = document.getElementById("close-food-modal");
 const modalFoodImage = document.getElementById("modal-food-image");
@@ -204,8 +206,35 @@ const modalFoodDescription = document.getElementById("modal-food-description");
 const modalFoodPrice = document.getElementById("modal-food-price");
 const modalStars = document.querySelectorAll(".modal-rating-star");
 const modalRatingMessage = document.getElementById("modal-rating-message");
-let modalSelectedRating = 0;
 
+// امتیازها بر اساس شناسه هر غذا جداگانه ذخیره می‌شوند.
+const modalRatingsStorageKey = "foodRatings";
+
+let modalSelectedRating = 0;
+let currentModalFoodId = null;
+
+// خواندن امتیازهای ذخیره‌شده از مرورگر
+function getSavedFoodRatings() {
+  try {
+    const savedRatings = JSON.parse(
+      localStorage.getItem(modalRatingsStorageKey)
+    );
+
+    if (
+      savedRatings &&
+      typeof savedRatings === "object" &&
+      !Array.isArray(savedRatings)
+    ) {
+      return savedRatings;
+    }
+  } catch (error) {
+    console.error("خواندن امتیازهای ذخیره‌شده ناموفق بود:", error);
+  }
+
+  return {};
+}
+
+// روشن یا خاموش کردن ستاره‌ها
 function updateModalStars(rating) {
   modalStars.forEach(function (star) {
     const value = Number(star.dataset.rating);
@@ -213,52 +242,89 @@ function updateModalStars(rating) {
   });
 }
 
+// نمایش پیام متناسب با امتیاز
+function updateModalRatingMessage(rating) {
+  if (!modalRatingMessage) return;
+
+  if (rating > 0) {
+    modalRatingMessage.textContent =
+      `امتیاز شما: ${rating} از ۵ ستاره`;
+  } else {
+    modalRatingMessage.textContent = "هنوز امتیازی ثبت نکرده‌اید.";
+  }
+}
+
 if (foodModal && closeFoodModal) {
-  // دکمه «مشاهده جزئیات» به‌جای رفتن به صفحه دیگر، مودال را باز می‌کند.
+  // باز کردن مودال جزئیات غذا
   document.querySelectorAll(".details-button").forEach(function (button) {
     button.addEventListener("click", function (event) {
       event.preventDefault();
+
       const card = button.closest(".food-card");
       if (!card) return;
+
+      // شناسه غذا برای ذخیره مستقل امتیاز آن
+      currentModalFoodId = card.dataset.id || null;
 
       const nameElement = card.querySelector("h3");
       const priceElement = card.querySelector(".price");
       const imageElement = card.querySelector("img");
+
       const descriptionElement = card.querySelector(
         "p:not(.price):not(.available):not(.unavailable)"
       );
 
-      modalFoodName.textContent = nameElement ? nameElement.textContent.trim() : "";
-      modalFoodPrice.textContent = priceElement ? priceElement.textContent.trim() : "";
+      modalFoodName.textContent = nameElement
+        ? nameElement.textContent.trim()
+        : "";
+
+      modalFoodPrice.textContent = priceElement
+        ? priceElement.textContent.trim()
+        : "";
+
       modalFoodDescription.textContent = descriptionElement
         ? descriptionElement.textContent.trim()
         : "توضیحی برای این غذا ثبت نشده است.";
 
       if (imageElement) {
         modalFoodImage.src = imageElement.src;
-        modalFoodImage.alt = nameElement ? nameElement.textContent.trim() : "تصویر غذا";
+        modalFoodImage.alt = nameElement
+          ? nameElement.textContent.trim()
+          : "تصویر غذا";
       }
 
-      // هر بار که مودال غذای دیگری باز می‌شود، امتیاز نمایشی از ابتدا شروع می‌شود.
-      modalSelectedRating = 0;
-      updateModalStars(0);
-      if (modalRatingMessage) {
-        modalRatingMessage.textContent = "هنوز امتیازی ثبت نکرده‌اید.";
-      }
+      // بازیابی امتیاز قبلی همین غذا
+      const savedRatings = getSavedFoodRatings();
+      const savedRating = Number(savedRatings[currentModalFoodId]);
+
+      modalSelectedRating =
+        currentModalFoodId &&
+        Number.isInteger(savedRating) &&
+        savedRating >= 1 &&
+        savedRating <= 5
+          ? savedRating
+          : 0;
+
+      updateModalStars(modalSelectedRating);
+      updateModalRatingMessage(modalSelectedRating);
+
       foodModal.classList.add("show");
     });
   });
 
+  // بستن مودال با دکمه بستن
   closeFoodModal.addEventListener("click", function () {
     foodModal.classList.remove("show");
   });
 
+  // بستن مودال با کلیک روی فضای بیرون آن
   foodModal.addEventListener("click", function (event) {
     if (event.target === foodModal) {
       foodModal.classList.remove("show");
     }
   });
 
+  // بستن مودال با کلید Escape
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape") {
       foodModal.classList.remove("show");
@@ -266,23 +332,55 @@ if (foodModal && closeFoodModal) {
   });
 }
 
-// ستاره‌ها با حرکت ماوس پیش‌نمایش می‌دهند و با کلیک انتخاب می‌شوند.
+// مدیریت تعامل کاربر با ستاره‌ها
 modalStars.forEach(function (star) {
+  // پیش‌نمایش امتیاز هنگام رفتن ماوس روی ستاره
   star.addEventListener("mouseenter", function () {
     updateModalStars(Number(star.dataset.rating));
   });
 
+  // برگشت به امتیاز ثبت‌شده پس از خارج شدن ماوس
   star.addEventListener("mouseleave", function () {
     updateModalStars(modalSelectedRating);
   });
 
+  // ثبت و ذخیره امتیاز با کلیک
   star.addEventListener("click", function () {
-    modalSelectedRating = Number(star.dataset.rating);
-    updateModalStars(modalSelectedRating);
-    if (modalRatingMessage) {
-      modalRatingMessage.textContent = `امتیاز شما: ${modalSelectedRating} از ۵ ستاره`;
+    if (!currentModalFoodId) {
+      if (modalRatingMessage) {
+        modalRatingMessage.textContent =
+          "شناسه غذا مشخص نیست؛ امتیاز ذخیره نشد.";
+      }
+      return;
+    }
+
+    const rating = Number(star.dataset.rating);
+
+    if (!Number.isInteger(rating) || rating < 1 || rating > 5) {
+      return;
+    }
+
+    const savedRatings = getSavedFoodRatings();
+
+    // فقط امتیاز غذای انتخاب‌شده تغییر می‌کند.
+    savedRatings[currentModalFoodId] = rating;
+
+    try {
+      localStorage.setItem(
+        modalRatingsStorageKey,
+        JSON.stringify(savedRatings)
+      );
+
+      modalSelectedRating = rating;
+      updateModalStars(modalSelectedRating);
+      updateModalRatingMessage(modalSelectedRating);
+    } catch (error) {
+      console.error("ذخیره امتیاز ناموفق بود:", error);
+
+      if (modalRatingMessage) {
+        modalRatingMessage.textContent =
+          "ذخیره امتیاز انجام نشد. لطفاً دوباره تلاش کنید.";
+      }
     }
   });
 });
-
-console.log("فیلترها، سبد و مودال غذا آماده‌اند.");

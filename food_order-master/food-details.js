@@ -366,12 +366,39 @@ if (food) {
     ingredients.appendChild(li);
   });
 }
-/* raiting stars*/
+
+/* امتیازدهی به غذاها */
+
+// پیدا کردن ستاره‌ها و محل نمایش پیام امتیاز
 const ratingStars = document.querySelectorAll(".rating-star");
 const ratingMessage = document.getElementById("rating-message");
 
-let selectedRating = 0;
+// نام کلید ذخیره امتیازها در مرورگر
+const ratingsStorageKey = "foodRatings";
 
+// دریافت امتیازهای قبلی از localStorage
+let savedRatings = {};
+
+try {
+  const storedRatings = JSON.parse(
+    localStorage.getItem(ratingsStorageKey)
+  );
+
+  if (
+    storedRatings &&
+    typeof storedRatings === "object" &&
+    !Array.isArray(storedRatings)
+  ) {
+    savedRatings = storedRatings;
+  }
+} catch (error) {
+  savedRatings = {};
+}
+
+// بازیابی امتیاز همین غذا، با استفاده از شناسه آن
+let selectedRating = Number(savedRatings[foodId]) || 0;
+
+// فعال یا غیرفعال کردن ستاره‌ها بر اساس امتیاز
 function updateStars(rating) {
   ratingStars.forEach((star) => {
     const value = Number(star.dataset.rating);
@@ -379,17 +406,44 @@ function updateStars(rating) {
   });
 }
 
+// اگر قبلاً به این غذا امتیاز داده شده، آن را نمایش بده
+if (selectedRating > 0) {
+  updateStars(selectedRating);
+
+  if (ratingMessage) {
+    ratingMessage.textContent =
+      `امتیاز شما: ${selectedRating} از ۵ ستاره`;
+  }
+}
+
+// مدیریت حرکت ماوس و کلیک روی ستاره‌ها
 ratingStars.forEach((star) => {
+  // نمایش موقت ستاره‌ها هنگام حرکت ماوس
   star.addEventListener("mouseover", () => {
     updateStars(Number(star.dataset.rating));
   });
 
+  // ثبت امتیاز با کلیک روی ستاره
   star.addEventListener("click", () => {
     selectedRating = Number(star.dataset.rating);
+
+    // ذخیره امتیاز با شناسه اختصاصی همین غذا
+    savedRatings[foodId] = selectedRating;
+
+    localStorage.setItem(
+      ratingsStorageKey,
+      JSON.stringify(savedRatings)
+    );
+
     updateStars(selectedRating);
-    ratingMessage.textContent = `امتیاز شما: ${selectedRating} از ۵ ستاره`;
+
+    if (ratingMessage) {
+      ratingMessage.textContent =
+        `امتیاز شما: ${selectedRating} از ۵ ستاره`;
+    }
   });
 
+  // پس از خارج شدن ماوس، امتیاز ثبت‌شده را نمایش بده
   star.addEventListener("mouseout", () => {
     updateStars(selectedRating);
   });
